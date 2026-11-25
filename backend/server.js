@@ -12,6 +12,9 @@ const { seedSuperAdmin } = require('./scripts/seedSuperAdmin');
 
 const app = express();
 
+// Enable trust proxy for secure cookies and accurate IP behind reverse proxies (Vercel, Render, etc.)
+app.set('trust proxy', 1);
+
 // Security HTTP headers
 app.use(helmet());
 
@@ -23,17 +26,19 @@ if (NODE_ENV !== 'test') {
 // CORS configuration supporting HttpOnly cookies and credentials
 const allowedOrigins = [
   CLIENT_URL,
+  'https://erp-machine-test.vercel.app',
   'http://localhost:5173',
   'http://127.0.0.1:5173',
   'http://localhost:3000'
-];
+].map((url) => (url ? url.replace(/\/$/, '') : '')).filter(Boolean);
 
 app.use(
   cors({
     origin: function (origin, callback) {
       // Allow requests with no origin (like mobile apps, curl, Postman)
       if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) !== -1 || NODE_ENV === 'development') {
+      const cleanOrigin = origin.replace(/\/$/, '');
+      if (allowedOrigins.includes(cleanOrigin) || NODE_ENV === 'development') {
         callback(null, true);
       } else {
         callback(new Error('Blocked by CORS policy'));
