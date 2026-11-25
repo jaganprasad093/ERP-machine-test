@@ -13,12 +13,15 @@ import { User, Save, AlertCircle, Loader2 } from 'lucide-react';
 const profileSchema = z.object({
   name: z
     .string()
+    .min(1, 'Full name is required')
     .min(2, 'Name must be at least 2 characters')
-    .max(100, 'Name cannot exceed 100 characters'),
+    .max(100, 'Name cannot exceed 100 characters')
+    .regex(/^[a-zA-Z\s'-]+$/, 'Name can only contain letters, spaces, hyphens, and apostrophes'),
   phone: z
     .string()
-    .min(7, 'Phone number must be at least 7 characters')
-    .max(20, 'Phone number cannot exceed 20 characters')
+    .min(1, 'Phone number is required')
+    .length(10, 'Phone number must be exactly 10 digits')
+    .regex(/^\d{10}$/, 'Phone number must contain only 10 digits')
 });
 
 export const ProfilePage = () => {
@@ -132,9 +135,17 @@ export const ProfilePage = () => {
           <Input
             label="Phone Number"
             type="tel"
-            placeholder="+1 555-0100"
+            placeholder="e.g. 9876543210"
             required
+            maxLength={10}
+            helperText="10 digits only, no spaces or symbols"
             error={errors.phone?.message}
+            onKeyDown={(e) => {
+              const allowed = ['Backspace','Delete','Tab','ArrowLeft','ArrowRight','Home','End'];
+              if (!allowed.includes(e.key) && !/^\d$/.test(e.key)) {
+                e.preventDefault();
+              }
+            }}
             {...register('phone')}
           />
 

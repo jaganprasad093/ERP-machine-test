@@ -25,9 +25,8 @@ const createAdminSchema = z
     phone: z
       .string()
       .min(1, 'Phone number is required')
-      .min(7, 'Phone number must be at least 7 digits')
-      .max(20, 'Phone number cannot exceed 20 characters')
-      .regex(/^\+?[\d\s\-().]+$/, 'Please enter a valid phone number'),
+      .length(10, 'Phone number must be exactly 10 digits')
+      .regex(/^\d{10}$/, 'Phone number must contain only 10 digits'),
     password: z
       .string()
       .min(1, 'Password is required')
@@ -131,9 +130,18 @@ export const CreateAdminPage = () => {
             <Input
               label="Phone Number"
               type="tel"
-              placeholder="+1 555-0199"
+              placeholder="e.g. 9876543210"
               required
+              maxLength={10}
+              helperText="10 digits only, no spaces or symbols"
               error={errors.phone?.message}
+              onKeyDown={(e) => {
+                // Allow: backspace, delete, tab, arrows, home, end
+                const allowed = ['Backspace','Delete','Tab','ArrowLeft','ArrowRight','Home','End'];
+                if (!allowed.includes(e.key) && !/^\d$/.test(e.key)) {
+                  e.preventDefault();
+                }
+              }}
               {...register('phone')}
             />
           </div>
