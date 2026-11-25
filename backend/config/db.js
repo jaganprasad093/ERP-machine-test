@@ -15,7 +15,17 @@ const connectDB = async () => {
   } catch (err) {
     console.warn(`[Database] Could not connect to primary MongoDB (${err.message}).`);
     
-    // Fallback: If not in strict production or if primary failed, initialize MongoMemoryServer
+    // In production or on Vercel serverless, do NOT attempt to start MongoMemoryServer
+    if (NODE_ENV === 'production' || process.env.VERCEL) {
+      console.error(
+        '[Database] FATAL: Failed to connect to MongoDB in production. Please ensure MONGO_URI is configured in your Vercel Environment Variables.'
+      );
+      throw new Error(
+        `Database connection failed: ${err.message}. Please configure a valid MONGO_URI in Vercel environment variables.`
+      );
+    }
+
+    // Fallback: If not in production and running locally without Mongo daemon, initialize MongoMemoryServer
     try {
       console.log('[Database] Initializing in-memory MongoDB fallback...');
       const { MongoMemoryServer } = require('mongodb-memory-server');
