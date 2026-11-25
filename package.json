@@ -1,0 +1,17 @@
+{
+  "name": "erp-management-system",
+  "version": "1.0.0",
+  "description": "Simple, Modern, Secure, and Scalable ERP Management System using MERN Stack",
+  "scripts": {
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev": "node -e \"const { spawn } = require('child_process'); spawn('npm', ['run', 'dev', '--prefix', 'backend'], { stdio: 'inherit', shell: true }); spawn('npm', ['run', 'dev', '--prefix', 'frontend'], { stdio: 'inherit', shell: true });\"",
+    "start": "npm start --prefix backend",
+    "seed": "npm run seed --prefix backend",
+    "test": "npm test --prefix backend",
+    "build": "npm run build --prefix frontend"
+  },
+  "keywords": ["erp", "mern", "react", "express", "mongodb", "tailwind", "jwt"],
+  "author": "",
+  "license": "ISC"
+}
