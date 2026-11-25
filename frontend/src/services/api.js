@@ -1,7 +1,14 @@
 import axios from 'axios';
 
+// Get base URL from environment variables or default to '/api' for local proxy
+const rawBaseURL = import.meta.env.API_BASE_URL || import.meta.env.VITE_API_BASE_URL || '/api';
+const baseURL =
+  rawBaseURL && rawBaseURL.startsWith('http') && !rawBaseURL.endsWith('/api')
+    ? `${rawBaseURL.replace(/\/$/, '')}/api`
+    : rawBaseURL;
+
 const api = axios.create({
-  baseURL: import.meta.env.API_BASE_URL || import.meta.env.VITE_API_BASE_URL || '/api',
+  baseURL,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json'
