@@ -13,19 +13,28 @@ const createAdminSchema = z
   .object({
     name: z
       .string()
+      .min(1, 'Full name is required')
       .min(2, 'Full name must be at least 2 characters')
-      .max(100, 'Name cannot exceed 100 characters'),
+      .max(100, 'Name cannot exceed 100 characters')
+      .regex(/^[a-zA-Z\s'-]+$/, 'Name can only contain letters, spaces, hyphens, and apostrophes'),
     email: z
       .string()
       .min(1, 'Email address is required')
-      .email('Please enter a valid email address'),
+      .email('Please enter a valid email address')
+      .max(100, 'Email cannot exceed 100 characters'),
     phone: z
       .string()
-      .min(7, 'Phone number must be at least 7 digits')
-      .max(20, 'Phone number cannot exceed 20 characters'),
+      .min(1, 'Phone number is required')
+      .length(10, 'Phone number must be exactly 10 digits')
+      .regex(/^\d{10}$/, 'Phone number must contain only 10 digits'),
     password: z
       .string()
-      .min(6, 'Password must be at least 6 characters long'),
+      .min(1, 'Password is required')
+      .min(6, 'Password must be at least 6 characters')
+      .max(100, 'Password cannot exceed 100 characters')
+      .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+      .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+      .regex(/[0-9]/, 'Password must contain at least one number'),
     confirmPassword: z.string().min(1, 'Please confirm the password'),
     status: z.enum(['ACTIVE', 'INACTIVE'])
   })
@@ -121,9 +130,18 @@ export const CreateAdminPage = () => {
             <Input
               label="Phone Number"
               type="tel"
-              placeholder="+1 555-0199"
+              placeholder="e.g. 9876543210"
               required
+              maxLength={10}
+              helperText="10 digits only, no spaces or symbols"
               error={errors.phone?.message}
+              onKeyDown={(e) => {
+                // Allow: backspace, delete, tab, arrows, home, end
+                const allowed = ['Backspace','Delete','Tab','ArrowLeft','ArrowRight','Home','End'];
+                if (!allowed.includes(e.key) && !/^\d$/.test(e.key)) {
+                  e.preventDefault();
+                }
+              }}
               {...register('phone')}
             />
           </div>
@@ -134,7 +152,7 @@ export const CreateAdminPage = () => {
               type="password"
               placeholder="••••••••"
               required
-              helperText="Min. 6 characters"
+              helperText="Min. 6 chars · uppercase · lowercase · number"
               error={errors.password?.message}
               {...register('password')}
             />
